@@ -1,4 +1,8 @@
+import dotenv from "dotenv";
 import express from "express";
+import { testConnection } from "./db";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -6,9 +10,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.get("/", (_req, res) => {
-       res.send("This works");
+       res.send("This workzzszs");
 });
 
 app.listen(PORT, () => {
-       console.log(`Server running on http://localhost:${PORT}`);
+       testConnection();
+       console.log(`Server runningzs on http://localhost:${PORT}`);
 });

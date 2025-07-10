@@ -1,0 +1,43 @@
+services:
+       app:
+              build: .
+              container_name: esc-booking-backend
+              ports:
+                     - "3000:3000"
+              volumes:
+                     - ./src:/usr/src/app/src
+                     - ./package.json:/usr/src/app/package.json
+                     - ./tsconfig.json:/usr/src/app/tsconfig.json
+                     - ./.env:/usr/src/app/.env
+                     - /usr/src/app/node_modules
+              depends_on:
+                     - db-test
+              networks:
+                     - app-network
+              restart: unless-stopped
+              stdin_open: true
+              tty: true
+
+       db-test:
+              image: mysql:8.0
+              container_name: esc-mysql-test
+              environment:
+                     MYSQL_ROOT_PASSWORD: rootpassword
+                     MYSQL_DATABASE: esc_hotel_db
+                     MYSQL_USER: testuser
+                     MYSQL_PASSWORD: testpassword
+              ports:
+                     - "3307:3306"
+              volumes:
+                     - mysql_data:/var/lib/mysql
+                     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+              networks:
+                     - app-network
+              restart: unless-stopped
+
+volumes:
+       mysql_data:
+
+networks:
+       app-network:
+              driver: bridge
