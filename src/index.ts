@@ -10,10 +10,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.get("/", (_req, res) => {
-       res.send("This workzzzs");
+       res.send("This workzzszs");
 });
 
 app.listen(PORT, () => {
        testConnection();
-       console.log(`Server runningz on http://localhost:${PORT}`);
+       console.log(`Server runningzs on http://localhost:${PORT}`);
 });
