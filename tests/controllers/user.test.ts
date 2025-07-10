@@ -1,13 +1,9 @@
-// tests/controllers/userController.test.js
-const request = require("supertest");
-const express = require("express");
+import express from "express";
+import request from "supertest";
+import userRoutes from "../../src/routes/userRoutes";
 
-// Mock your app setup
 const app = express();
 app.use(express.json());
-
-// Mock user routes (adjust path as needed)
-const userRoutes = require("../../src/routes/userRoutes");
 app.use("/api/users", userRoutes);
 
 describe("User Controller", () => {
