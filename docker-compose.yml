@@ -8,7 +8,7 @@ services:
                      - ./src:/usr/src/app/src
                      - ./package.json:/usr/src/app/package.json
                      - ./tsconfig.json:/usr/src/app/tsconfig.json
-                     - ./.env:/usr/src/app/.env
+                     - ./.env.dev:/usr/src/app/.env.dev
                      - /usr/src/app/node_modules
               depends_on:
                      - db-test

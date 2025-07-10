@@ -1,11 +1,13 @@
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
-dotenv.config();
+
+dotenv.config({ path: ".env.dev" });
+
 const dbConfig = {
        host: process.env.DB_HOST,
        user: process.env.DB_USER,
        password: process.env.DB_PASSWORD,
-       database: process.env.DB_NAME || "esc_hotel_db",
+       database: process.env.DB_NAME,
        port: parseInt(process.env.DB_PORT || "3306"),
 };
 

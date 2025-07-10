@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { testConnection } from "./db";
 
-dotenv.config();
+dotenv.config({ path: ".env.dev" });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
