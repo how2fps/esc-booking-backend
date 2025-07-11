@@ -19,13 +19,16 @@
               "test:coverage": "jest --coverage"
        },
        "dependencies": {
+              "@types/express-session": "^1.18.2",
               "bcrypt": "^6.0.0",
               "dotenv": "^17.1.0",
               "express": "^5.1.0",
+              "express-session": "^1.18.1",
               "mysql2": "^3.14.1"
        },
        "devDependencies": {
               "@types/bcrypt": "^5.0.2",
+              "@types/bcryptjs": "^2.4.6",
               "@types/express": "^5.0.3",
               "@types/jest": "^30.0.0",
               "@types/node": "^24.0.0",

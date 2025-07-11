@@ -1,12 +1,32 @@
 import express from "express";
 
+import session from "express-session";
 import request from "supertest";
 import { default as db, default as pool } from "../../src/db";
 import userRoutes from "../../src/routes/userRoutes";
-
+const mockDb = db as jest.Mocked<typeof db>;
 const app = express();
 app.use(express.json());
+app.use(
+       session({
+              secret: "8237128eu12",
+              resave: false,
+              saveUninitialized: false,
+              cookie: {
+                     maxAge: 1800000,
+                     httpOnly: true,
+                     secure: false,
+                     sameSite: "lax",
+              },
+       })
+);
 app.use("/api/users", userRoutes);
+const testUser = {
+       name: "Test User",
+       email: "test@example.com",
+       password: "securePassword123",
+       phone_number: "99999999",
+};
 
 describe("User Controller", () => {
        describe("GET /api/users", () => {
@@ -36,18 +56,7 @@ describe("User Controller", () => {
        });
 
        describe("POST /api/users/signup", () => {
-              const testUser = {
-                     name: "Test User",
-                     email: "test@example.com",
-                     password: "securePassword123",
-                     phone_number: "99999999",
-              };
-
               beforeAll(async () => {
-                     await db.execute("DELETE FROM users WHERE email = ?", [testUser.email]);
-              });
-
-              afterAll(async () => {
                      await db.execute("DELETE FROM users WHERE email = ?", [testUser.email]);
               });
 
@@ -67,6 +76,23 @@ describe("User Controller", () => {
                      const res = await request(app).post("/api/users/signup").send(testUser).expect(409);
                      expect(res.body).toHaveProperty("success", false);
                      expect(res.body).toHaveProperty("message", "Email already in use");
+              });
+       });
+
+       describe("POST /api/users/login", () => {
+              it("should login", async () => {
+                     const res = await request(app).post("/api/users/login").send(testUser).expect(200);
+                     expect(res.body).toHaveProperty("success", true);
+                     expect(res.body.data).toHaveProperty("id");
+                     expect(res.body.data).toMatchObject({
+                            id: expect.any(Number),
+                            name: testUser.name,
+                            email: testUser.email,
+                     });
+              });
+
+              afterAll(async () => {
+                     await db.execute("DELETE FROM users WHERE email = ?", [testUser.email]);
               });
        });
 });

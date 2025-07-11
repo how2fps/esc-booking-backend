@@ -1,7 +1,15 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../db";
+
+declare module "express-session" {
+       interface SessionData {
+              userId?: number;
+              userName?: string;
+              userEmail?: string;
+       }
+}
 
 export const getAllUsers = async (req: Request, res: Response) => {
        try {
@@ -83,16 +91,50 @@ export const login = async (req: Request, res: Response) => {
        try {
               const { email, password } = req.body;
               if (!email || !password || email.trim() === "" || password.trim() === "") {
-                     return res.status(400).json({
+                     res.status(400).json({
                             success: false,
                             message: "Email and password are required",
                      });
               }
 
-              const [rows] = await db.execute("SELECT id, name, email, password WHERE email = ?", [email]);
+              const [rows] = await db.execute<RowDataPacket[]>("SELECT id, name, email, password FROM users WHERE email = ?", [email]);
 
               if (rows.length === 0) {
-                     
+                     res.status(401).json({
+                            success: false,
+                            message: "Invalid email or password",
+                     });
+                     return;
               }
-       } catch (error: any) {}
+              const user = rows[0];
+              const isValidPassword = await bcrypt.compare(password, user.password);
+              if (!isValidPassword) {
+                     res.status(401).json({
+                            success: false,
+                            message: "Invalid email or password",
+                     });
+                     return;
+              }
+
+              req.session.userId = user.id;
+              req.session.userName = user.name;
+              req.session.userEmail = user.email;
+
+              res.status(200).json({
+                     success: true,
+                     message: "Login successful",
+                     data: {
+                            id: user.id,
+                            name: user.name,
+                            email: user.email,
+                     },
+              });
+              return;
+       } catch (error: any) {
+              console.error("Error login:", error);
+              res.status(500).json({
+                     success: false,
+                     message: "Error during login",
+              });
+       }
 };
