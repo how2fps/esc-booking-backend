@@ -18,4 +18,5 @@ INSERT INTO users (password, name, phone_number, email, loyalty_points) VALUES
 ('password123', 'Carol Williams', '+1-555-0103', 'carol.williams@email.com', 200),
 ('password123', 'David Brown', '+1-555-0104', 'david.brown@email.com', 45),
 ('password123', 'Emma Davis', '+1-555-0105', 'emma.davis@email.com', 150),
-('password123', 'Frank Miller', '+1-555-0106', 'frank.miller@email.com', 75);
+('password123', 'Frank Miller', '+1-555-0106', 'frank.miller@email.com', 75)
+ON DUPLICATE KEY UPDATE name=name;

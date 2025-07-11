@@ -11,6 +11,7 @@ services:
                      - ./tsconfig.json:/usr/src/app/tsconfig.json
                      - ./.env.dev:/usr/src/app/.env.dev
                      - /usr/src/app/node_modules
+                     - ./jest.config.js:/usr/src/app/jest.config.js
               depends_on:
                      - db-test
               networks:
@@ -31,7 +32,7 @@ services:
                      - "3307:3306"
               volumes:
                      - mysql_data:/var/lib/mysql
-                     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+                     - ./init.sql:/docker-entrypoint-initdb.d/init.sqles
               networks:
                      - app-network
               restart: unless-stopped
