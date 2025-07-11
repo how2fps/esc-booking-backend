@@ -11,8 +11,10 @@ services:
                      - ./tsconfig.json:/usr/src/app/tsconfig.json
                      - ./.env.dev:/usr/src/app/.env.dev
                      - /usr/src/app/node_modules
+                     - ./jest.config.js:/usr/src/app/jest.config.js
               depends_on:
-                     - db-test
+                     db-test:
+                            condition: service_healthy
               networks:
                      - app-network
               restart: unless-stopped
@@ -22,6 +24,11 @@ services:
        db-test:
               image: mysql:8.0
               container_name: esc-mysql-test
+              healthcheck:
+                     test: ["CMD-SHELL", "mysql -u testuser -ptestpassword -e 'SELECT 1' esc_hotel_db"]
+                     interval: 5s
+                     timeout: 5s
+                     retries: 10
               environment:
                      MYSQL_ROOT_PASSWORD: rootpassword
                      MYSQL_DATABASE: esc_hotel_db
