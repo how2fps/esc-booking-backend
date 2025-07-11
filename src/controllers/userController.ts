@@ -1,4 +1,6 @@
+import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import { ResultSetHeader } from "mysql2";
 import db from "../db";
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -48,5 +50,31 @@ export const getUserByEmail = async (req: Request, res: Response) => {
                      success: false,
                      message: "Error fetching users",
               });
+       }
+};
+
+export const signUp = async (req: Request, res: Response) => {
+       try {
+              const { name, email, password, phone_number } = req.body;
+              const hashedPassword = await bcrypt.hash(password, 10);
+
+              const [result] = (await db.execute("INSERT INTO users (name, email, password, phone_number, loyalty_points) VALUES (?, ?, ?, ?, ?)", [name, email, hashedPassword, phone_number, 0])) as [ResultSetHeader, any];
+              res.status(201).json({
+                     success: true,
+                     data: { id: result.insertId, name, email, phone_number, loyalty_points: 0 },
+              });
+       } catch (error: any) {
+              if (error.code === "ER_DUP_ENTRY") {
+                     res.status(409).json({
+                            success: false,
+                            message: "Email already in use",
+                     });
+              } else {
+                     console.error("Error signUp:", error);
+                     res.status(500).json({
+                            success: false,
+                            message: "Error signing up",
+                     });
+              }
        }
 };

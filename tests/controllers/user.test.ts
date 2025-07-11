@@ -1,7 +1,7 @@
 import express from "express";
 
 import request from "supertest";
-import pool from "../../src/db";
+import { default as db, default as pool } from "../../src/db";
 import userRoutes from "../../src/routes/userRoutes";
 
 const app = express();
@@ -32,6 +32,41 @@ describe("User Controller", () => {
                             loyalty_points: 120,
                             created_at: expect.any(String),
                      });
+              });
+       });
+
+       describe("POST /api/users/signup", () => {
+              const testUser = {
+                     name: "Test User",
+                     email: "test@example.com",
+                     password: "securePassword123",
+                     phone_number: "99999999",
+              };
+
+              beforeAll(async () => {
+                     await db.execute("DELETE FROM users WHERE email = ?", [testUser.email]);
+              });
+
+              afterAll(async () => {
+                     await db.execute("DELETE FROM users WHERE email = ?", [testUser.email]);
+              });
+
+              it("should sign up a new user", async () => {
+                     const res = await request(app).post("/api/users/signup").send(testUser).expect(201);
+                     expect(res.body).toHaveProperty("success", true);
+                     expect(res.body.data).toHaveProperty("id");
+                     expect(res.body.data).toMatchObject({
+                            id: expect.any(Number),
+                            name: testUser.name,
+                            email: testUser.email,
+                            phone_number: testUser.phone_number,
+                            loyalty_points: 0,
+                     });
+              });
+              it("should not allow duplicate email sign-up", async () => {
+                     const res = await request(app).post("/api/users/signup").send(testUser).expect(409);
+                     expect(res.body).toHaveProperty("success", false);
+                     expect(res.body).toHaveProperty("message", "Email already in use");
               });
        });
 });
