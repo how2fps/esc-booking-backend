@@ -1,5 +1,6 @@
 import express from "express";
 import request from "supertest";
+import pool from "../../src/db";
 import userRoutes from "../../src/routes/userRoutes";
 
 const app = express();
@@ -15,4 +16,7 @@ describe("User Controller", () => {
                      expect(Array.isArray(response.body.data)).toBe(true);
               });
        });
+});
+afterAll(async () => {
+       await pool.end();
 });
