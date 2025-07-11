@@ -11,7 +11,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
                      data: rows,
               });
        } catch (error) {
-              console.error("Error fetching users:", error);
+              console.error("Error getAllUsers:", error);
               res.status(500).json({
                      success: false,
                      message: "Error fetching users",
@@ -28,10 +28,10 @@ export const getUserById = async (req: Request, res: Response) => {
                      data: rows,
               });
        } catch (error) {
-              console.error("Error fetching users:", error);
+              console.error("Error getUserById:", error);
               res.status(500).json({
                      success: false,
-                     message: "Error fetching users",
+                     message: "Error fetching user by ID",
               });
        }
 };
@@ -45,10 +45,10 @@ export const getUserByEmail = async (req: Request, res: Response) => {
                      data: rows,
               });
        } catch (error) {
-              console.error("Error fetching users:", error);
+              console.error("Error getUserByEmail:", error);
               res.status(500).json({
                      success: false,
-                     message: "Error fetching users",
+                     message: "Error fetching user by email",
               });
        }
 };
@@ -77,4 +77,22 @@ export const signUp = async (req: Request, res: Response) => {
                      });
               }
        }
+};
+
+export const login = async (req: Request, res: Response) => {
+       try {
+              const { email, password } = req.body;
+              if (!email || !password || email.trim() === "" || password.trim() === "") {
+                     return res.status(400).json({
+                            success: false,
+                            message: "Email and password are required",
+                     });
+              }
+
+              const [rows] = await db.execute("SELECT id, name, email, password WHERE email = ?", [email]);
+
+              if (rows.length === 0) {
+                     
+              }
+       } catch (error: any) {}
 };
