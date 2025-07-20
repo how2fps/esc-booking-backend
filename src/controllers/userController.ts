@@ -95,6 +95,7 @@ export const login = async (req: Request, res: Response) => {
                             success: false,
                             message: "Email and password are required",
                      });
+                     return
               }
 
               const [rows] = await db.execute<RowDataPacket[]>("SELECT id, name, email, password FROM users WHERE email = ?", [email]);
