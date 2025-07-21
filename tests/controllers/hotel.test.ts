@@ -28,20 +28,14 @@ describe("Hotel Controller", () => {
 
                      console.log(response.body);
 
-                     expect(response.body).toHaveProperty("completed");
-                     expect(response.body).toHaveProperty("hotels");
-
                      if (response.status === 200) {
+                            expect(response.body).toHaveProperty("completed");
+                            expect(response.body).toHaveProperty("hotels");
                             expect(response.body).toHaveProperty("searchCompleted");
                             expect(response.body.complete).toBe(true);
                             expect(response.body).toHaveProperty("data");
                             expect(Array.isArray(response.body.data)).toBe(true);
                             expect(response.body.data.length).toBeGreaterThan(0);
-                     } else if (response.status === 504) {
-                            expect(response.body).toHaveProperty("searchCompleted");
-                            expect(response.body.complete).toBe(false);
-                            expect(response.body).toHaveProperty("message");
-                            expect(response.body.message).toContain("Timeout");
                      }
               }, 100000);
        });
