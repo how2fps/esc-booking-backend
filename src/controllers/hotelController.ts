@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const getAllHotels = async (req: Request, res: Response) => {
        try {
               const queryString = new URLSearchParams(req.query as any).toString();
@@ -15,32 +17,31 @@ export const getAllHotels = async (req: Request, res: Response) => {
        }
 };
 
-export const pollAllHotelPrices = async (req: Request, res: Response) => {
+export const pollAllHotelPrices = async (req: Request, res: Response): Promise<void> => {
        try {
-              const maxRetries = 10;
+              const maxRetries = 40;
               let tries = 0;
-              const interval = 3000;
               const queryString = new URLSearchParams(req.query as any).toString();
-              const poll = async () => {
+              console.log(queryString);
+
+              while (tries < maxRetries) {
                      try {
                             const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/prices?${queryString}`);
                             const data = await response.json();
                             console.log(data);
-                            if (data && data.length > 0) {
-                                   return res.status(200).json({ complete: true, data });
+                            if (data && data.completed) {
+                                   res.status(200).json({ complete: true, data });
+                                   return;
                             }
                             tries++;
-                            if (tries < maxRetries) {
-                                   setTimeout(poll, interval);
-                            } else {
-                                   res.status(504).json({ complete: false, message: "Timeout waiting for price data" });
-                            }
+                            await sleep(2000);
                      } catch (error) {
-                            console.error("Polling error:", error);
-                            res.status(500).json({ error: "Internal Server Error during polling" });
+                            console.log(error);
                      }
-              };
-
-              poll();
-       } catch (error) {}
+              }
+              res.status(504).json({ complete: false, message: "Timeout waiting for price data" });
+       } catch (error) {
+              console.log(error);
+              res.status(500).json({ error: "Internal Server Error" });
+       }
 };
