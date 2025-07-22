@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const getAllHotels = async (req: Request, res: Response) => {
+//api/hotels?destination_id=RsBU
+export const getAllHotels = async (req: Request, res: Response): Promise<void> => {
        try {
               const queryString = new URLSearchParams(req.query as any).toString();
               const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels?${queryString}`);
@@ -17,6 +18,7 @@ export const getAllHotels = async (req: Request, res: Response) => {
        }
 };
 
+//api/hotels/prices?destination_id={}&checkin={yyyy-mm-dd}&checkout={yyyy-mm-dd}&lang={en_US}&currency={SGD}&country_code={SG}&guests={2}&partner_id={1}
 export const pollAllHotelPrices = async (req: Request, res: Response): Promise<void> => {
        try {
               const maxRetries = 40;
