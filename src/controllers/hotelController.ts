@@ -18,6 +18,7 @@ export const getAllHotels = async (req: Request, res: Response): Promise<void> =
        }
 };
 
+//api/hotels/prices?destination_id=RsBU&checkin=2025-7-23&checkout=2025-7-30&lang=en_US&currency=SGD&country_code=SG&guests=2&partner_id=1
 //api/hotels/prices?destination_id={}&checkin={yyyy-mm-dd}&checkout={yyyy-mm-dd}&lang={en_US}&currency={SGD}&country_code={SG}&guests={2}&partner_id={1}
 export const pollAllHotelPrices = async (req: Request, res: Response): Promise<void> => {
        try {

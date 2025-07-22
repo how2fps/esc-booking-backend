@@ -22,7 +22,23 @@ describe("Hotel Controller", () => {
               });
        });
 
-       describe("GET /api/hotels/prices", () => {
+       describe("GET /api/hotels/prices 1", () => {
+              it("should poll hotel prices and return chunks of it", async () => {
+                     const response = await request(app).get("/api/hotels/prices?destination_id=RsBU&checkin=2025-7-23&checkout=2025-7-30&lang=en_US&currency=SGD&country_code=SG&guests=2&partner_id=1").timeout(95000);
+
+                     console.log(response.body);
+
+                     if (response.status === 200) {
+                            expect(response.body.data).toHaveProperty("completed");
+                            expect(response.body.data).toHaveProperty("hotels");
+                            expect(response.body.data).toHaveProperty("searchCompleted");
+                            expect(response.body.data.completed).toBe(true);
+                            expect(Array.isArray(response.body.data.hotels)).toBe(true);
+                     }
+              }, 100000);
+       });
+
+       describe("GET /api/hotels/prices 2", () => {
               it("should poll hotel prices and return chunks of it", async () => {
                      const response = await request(app).get("/api/hotels/prices?destination_id=WD0M&checkin=2025-10-01&checkout=2025-10-07&lang=en_US&currency=SGD&country_code=SG&guests=2&partner_id=1").timeout(95000);
 
