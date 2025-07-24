@@ -95,6 +95,7 @@ export const login = async (req: Request, res: Response) => {
                             success: false,
                             message: "Email and password are required",
                      });
+                     return
               }
 
               const [rows] = await db.execute<RowDataPacket[]>("SELECT id, name, email, password FROM users WHERE email = ?", [email]);
@@ -137,4 +138,34 @@ export const login = async (req: Request, res: Response) => {
                      message: "Error during login",
               });
        }
+};
+
+export const logout = (req: Request, res: Response) => {
+	req.session.destroy((err) => {
+		if (err) {
+			return res.status(500).json({ success: false, message: "Logout failed" });
+		}
+		res.clearCookie("connect.sid"); // name of the session cookie
+		res.status(200).json({ success: true, message: "Logged out" });
+	});
+};
+
+export const getSessionUser = (req: Request, res: Response): void => {
+	try {
+		if (!req.session.userId || !req.session.userName || !req.session.userEmail) {
+			res.status(401).json({ success: false, message: "Not logged in" });
+			return;
+		}
+		res.status(200).json({
+			success: true,
+			data: {
+				id: req.session.userId,
+				name: req.session.userName,
+				email: req.session.userEmail,
+			},
+		});
+	} catch (error) {
+		console.error("Error getSessionUser:", error);
+		res.status(500).json({ success: false, message: "Error getting session user" });
+	}
 };
