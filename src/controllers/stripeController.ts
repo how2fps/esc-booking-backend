@@ -14,7 +14,7 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
         },
       ],
       mode: 'payment',
-      return_url: `http://127.0.0.1:5173/return?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `http://localhost:5173/return?session_id={CHECKOUT_SESSION_ID}`,
     });
     res.send({ clientSecret: session.client_secret });
   } catch (error: any) {
