@@ -4,6 +4,7 @@ services:
               container_name: esc-booking-backend
               ports:
                      - "3000:3000"
+                     - "4242:4242"
               volumes:
                      - ./src:/usr/src/app/src
                      - ./tests:/usr/src/app/tests
