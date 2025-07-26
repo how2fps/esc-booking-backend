@@ -47,3 +47,22 @@ export const pollAllHotelPrices = async (req: Request, res: Response): Promise<v
               res.status(500).json({ error: "Internal Server Error" });
        }
 };
+
+export const getHotelById = async (req: Request, res: Response): Promise<void> => {
+       try {
+              console.log("Getting hotel by ID");
+              const hotelId = req.params.id;
+              const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/${hotelId}`);
+              if (!response.ok) {
+                     throw new Error("Hotel not found");
+              }
+              const data = await response.json();
+              res.status(200).json(data);
+       } catch (error) {
+              console.error("Error getting hotel by ID:", error);
+              res.status(404).json({
+                     success: false,
+                     message: "Hotel not found",
+              });
+       }
+}
