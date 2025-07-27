@@ -5,6 +5,8 @@ import session from "express-session";
 import { testConnection } from "./db";
 import hotelRoutes from "./routes/hotelRoutes";
 import userRoutes from "./routes/userRoutes";
+import bookingRoutes from "./routes/bookingRoutes";
+
 
 dotenv.config({ path: ".env.dev" });
 
@@ -33,6 +35,7 @@ app.use(
 );
 app.use("/api/users", userRoutes);
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/bookings", bookingRoutes);
 app.get("/", (_req, res) => {
        res.send("This workzzszss");
 });
