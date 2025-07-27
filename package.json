@@ -8,7 +8,11 @@
        "type": "commonjs",
        "main": "index.js",
        "scripts": {
+<<<<<<< HEAD
               "start": "ts-node src/index.ts",
+=======
+              "start": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
+>>>>>>> 382970fe038d8b203ecc5f3ba7bea013fe1d524e
               "dev": "docker-compose up --build",
               "dev:stripe": "node server.mjs",
               "dev:down": "docker-compose down",
