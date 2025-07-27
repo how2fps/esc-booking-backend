@@ -3,11 +3,10 @@ import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
 import { testConnection } from "./db";
+import bookingRoutes from "./routes/bookingRoutes";
 import hotelRoutes from "./routes/hotelRoutes";
 import stripeRoutes from "./routes/stripeRoutes";
 import userRoutes from "./routes/userRoutes";
-import bookingRoutes from "./routes/bookingRoutes";
-
 
 dotenv.config({ path: ".env.dev" });
 
@@ -36,16 +35,13 @@ app.use(
 );
 app.use("/api/users", userRoutes);
 app.use("/api/hotels", hotelRoutes);
-<<<<<<< HEAD
 app.use("/api/bookings", bookingRoutes);
-=======
 app.use("/api/stripe", stripeRoutes);
->>>>>>> 382970fe038d8b203ecc5f3ba7bea013fe1d524e
 app.get("/", (_req, res) => {
-       res.send("This workzzszss");
+       res.send("Server running");
 });
 
 app.listen(PORT, () => {
        testConnection();
-       console.log(`Server runningzs on http://localhost:${PORT}`);
+       console.log(`Server running on http://localhost:${PORT}`);
 });
