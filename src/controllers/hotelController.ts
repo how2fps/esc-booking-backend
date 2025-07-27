@@ -72,6 +72,7 @@ export const getAllHotels = async (req: Request, res: Response): Promise<void> =
 //api/hotels/prices?destination_id=RsBU&checkin=2025-7-23&checkout=2025-7-30&lang=en_US&currency=SGD&country_code=SG&guests=2&partner_id=1
 //api/hotels/prices?destination_id={}&checkin={yyyy-mm-dd}&checkout={yyyy-mm-dd}&lang={en_US}&currency={SGD}&country_code={SG}&guests={2}&partner_id={1}
 export const pollAllHotelPrices = async (req: Request, res: Response): Promise<void> => {
+       //doesnt actually poll anymore, handling in frontend, will change name in the future
        try {
               const { destination_id, checkin, checkout, lang, currency, country_code, guests, partner_id } = req.query;
               if (!destination_id) {
@@ -92,28 +93,24 @@ export const pollAllHotelPrices = async (req: Request, res: Response): Promise<v
                      });
                      return;
               }
-              const maxRetries = 40;
-              let tries = 0;
               const queryString = `destination_id=${destination_id}&checkin=${checkin}&checkout=${checkout}&lang=${lang}&currency=${currency}&country_code=${country_code}&guests=${guests}&partner_id=${partner_id}`;
-              while (tries < maxRetries) {
-                     try {
-                            const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/prices?${queryString}`);
-                            const contentType = response.headers.get("content-type");
-                            if (!contentType || !contentType.includes("application/json")) {
-                                   const text = await response.text();
-                                   throw new Error(`Expected JSON but got: ${text.slice(0, 100)}...`);
-                            }
-                            const data = await response.json();
-                            if (data && data.completed) {
-                                   res.status(200).json({ complete: true, data });
-                                   return;
-                            }
-                            tries++;
-                            await sleep(2000);
-                     } catch (error) {
-                            console.log(error);
+              try {
+                     const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/prices?${queryString}`);
+                     const contentType = response.headers.get("content-type");
+                     if (!contentType || !contentType.includes("application/json")) {
+                            const text = await response.text();
+                            throw new Error(`Expected JSON but got: ${text.slice(0, 100)}...`);
                      }
+                     const data = await response.json();
+                     if (data && data.completed) {
+                            res.status(200).json({ complete: true, data });
+                            return;
+                     }
+                     await sleep(2000);
+              } catch (error) {
+                     console.log(error);
               }
+
               res.status(504).json({ complete: false, message: "Timeout waiting for price data" });
        } catch (error) {
               console.log(error);

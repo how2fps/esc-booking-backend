@@ -33,17 +33,37 @@ describe("GET /api/hotels", () => {
 });
 
 describe("GET /api/hotels/prices", () => {
-       it("should poll hotel prices and return chunks of it", async () => {
-              const response = await request(app).get("/api/hotels/prices?destination_id=WD0M&checkin=2025-10-01&checkout=2025-10-07&lang=en_US&currency=SGD&country_code=SG&guests=2&partner_id=1").timeout(95000);
+       it("should poll hotel prices until complete or timeout", async () => {
+              const maxAttempts = 40;
+              const interval = 2000;
+              let attempts = 0;
+              let completed = false;
+              let response;
 
-              console.log(response.body);
+              while (attempts < maxAttempts && !completed) {
+                     response = await request(app).get("/api/hotels/prices").query({
+                            destination_id: "WD0M",
+                            checkin: "2025-10-01",
+                            checkout: "2025-10-07",
+                            lang: "en_US",
+                            currency: "SGD",
+                            country_code: "SG",
+                            guests: 2,
+                            partner_id: 1,
+                     });
 
-              if (response.status === 200) {
-                     expect(response.body.data).toHaveProperty("completed");
-                     expect(response.body.data).toHaveProperty("hotels");
-                     expect(response.body.data).toHaveProperty("searchCompleted");
-                     expect(response.body.data.completed).toBe(true);
-                     expect(Array.isArray(response.body.data.hotels)).toBe(true);
+                     if (response.status === 200 && response.body.data?.completed) {
+                            completed = true;
+                            break;
+                     }
+
+                     attempts++;
+                     await new Promise((res) => setTimeout(res, interval));
               }
+
+              expect(completed).toBe(true);
+              expect(response).toBeDefined();
+              expect(response?.body?.data).toHaveProperty("hotels");
+              expect(Array.isArray(response?.body?.data?.hotels)).toBe(true);
        }, 100000);
 });
