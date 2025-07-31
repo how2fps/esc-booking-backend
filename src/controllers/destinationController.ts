@@ -32,7 +32,8 @@ export const getSearchResult = async (req: Request, res: Response): Promise<void
   corrected= "" // Now safe, corrected can't be null here
        }
   const filteredOptions = options.filter((i) => i.term && (i.term.toLowerCase().includes(search_term.toLowerCase()) || i.term.toLowerCase().includes(corrected.toLowerCase())));  
-  res.status(200).json(filteredOptions );
+  const uniqueOptions = Array.from(new Map(filteredOptions.map((item) => [item.term, item])).values());
+  res.status(200).json(uniqueOptions );
   return;
 };
 
