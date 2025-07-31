@@ -7,7 +7,7 @@ import bookingRoutes from "./routes/bookingRoutes";
 import hotelRoutes from "./routes/hotelRoutes";
 import stripeRoutes from "./routes/stripeRoutes";
 import userRoutes from "./routes/userRoutes";
-
+import searchRoutes from "./routes/searchRoutes"
 dotenv.config({ path: ".env.dev" });
 
 const app = express();
@@ -37,6 +37,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/search", searchRoutes);
 app.get("/", (_req, res) => {
        res.send("Server running");
 });
