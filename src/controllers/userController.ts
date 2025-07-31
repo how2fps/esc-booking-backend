@@ -197,3 +197,49 @@ export const updateProfile: RequestHandler = async (req, res) => {
        res.status(500).json({ success: false, message: "Error updating profile" });
     }
 };
+
+export const deleteAccount: RequestHandler = async (req, res) => {
+       try {
+         if (!req.session.userId) {
+           res.status(401).json({ success: false, message: "Not logged in" });
+           return;
+         }
+     
+         const { password } = req.body;
+         const userId = req.session.userId;
+     
+         const [rows] = await db.execute<RowDataPacket[]>(
+           "SELECT id, name, email, password, phone_number FROM users WHERE id = ?",
+           [userId]
+         );
+     
+         const user = rows[0];
+     
+         if (!user) {
+           res.status(404).json({ success: false, message: "User not found" });
+           return;
+         }
+     
+         const isValidPassword = await bcrypt.compare(password, user.password);
+         if (!isValidPassword) {
+           res.status(401).json({ success: false, message: "Invalid password" });
+           return;
+         }
+     
+         await db.execute("DELETE FROM users WHERE id = ?", [userId]);
+     
+         req.session.destroy((err) => {
+           if (err) {
+             console.error("Error deleting session:", err);
+             return res.status(500).json({ success: false, message: "Error deleting session" });
+           }
+     
+           res.clearCookie('connect.sid');
+           return res.status(200).json({ success: true, message: "Account deleted successfully" });
+         });
+       } catch (error) {
+         console.error("Error deleting account:", error);
+         res.status(500).json({ success: false, message: "Error deleting account" });
+       }
+     };
+     
