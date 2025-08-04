@@ -64,9 +64,9 @@ export const pollAllHotelPrices = async (req: Request, res: Response): Promise<v
                      return;
               }
               const queryString = `destination_id=${destination_id}&checkin=${checkin}&checkout=${checkout}&lang=${lang}&currency=${currency}&country_code=${country_code}&guests=${guests}&partner_id=${partner_id}&landing_page=${landing_page}&product_type=${product_type}`;
-              console.log(queryString);
               try {
                      const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/prices?${queryString}`);
+                     console.log(`https://hotelapi.loyalty.dev/api/hotels/prices?${queryString}`);
                      const contentType = response.headers.get("content-type");
                      if (!contentType || !contentType.includes("application/json")) {
                             const text = await response.text();
