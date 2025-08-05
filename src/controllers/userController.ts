@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Request, Response } from "express";
+import { Request, Response, RequestHandler } from "express";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import db from "../db";
 
@@ -8,6 +8,7 @@ declare module "express-session" {
               userId?: number;
               userName?: string;
               userEmail?: string;
+              userPhoneNumber?: number;
        }
 }
 
@@ -98,7 +99,7 @@ export const login = async (req: Request, res: Response) => {
                      return
               }
 
-              const [rows] = await db.execute<RowDataPacket[]>("SELECT id, name, email, password FROM users WHERE email = ?", [email]);
+              const [rows] = await db.execute<RowDataPacket[]>("SELECT id, name, email, password, phone_number FROM users WHERE email = ?", [email]);
 
               if (rows.length === 0) {
                      res.status(401).json({
@@ -120,6 +121,7 @@ export const login = async (req: Request, res: Response) => {
               req.session.userId = user.id;
               req.session.userName = user.name;
               req.session.userEmail = user.email;
+              req.session.userPhoneNumber = user.phone_number;
 
               res.status(200).json({
                      success: true,
@@ -128,6 +130,7 @@ export const login = async (req: Request, res: Response) => {
                             id: user.id,
                             name: user.name,
                             email: user.email,
+                            phone_number: user.phone_number,
                      },
               });
               return;
@@ -141,31 +144,101 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = (req: Request, res: Response) => {
-	req.session.destroy((err) => {
-		if (err) {
-			return res.status(500).json({ success: false, message: "Logout failed" });
-		}
-		res.clearCookie("connect.sid"); // name of the session cookie
-		res.status(200).json({ success: true, message: "Logged out" });
-	});
+       req.session.destroy((err) => {
+              if (err) {
+                     return res.status(500).json({ success: false, message: "Logout failed" });
+              }
+              res.clearCookie("connect.sid"); // name of the session cookie
+              res.status(200).json({ success: true, message: "Logged out" });
+       });
 };
 
 export const getSessionUser = (req: Request, res: Response): void => {
-	try {
-		if (!req.session.userId || !req.session.userName || !req.session.userEmail) {
-			res.status(401).json({ success: false, message: "Not logged in" });
-			return;
-		}
-		res.status(200).json({
-			success: true,
-			data: {
-				id: req.session.userId,
-				name: req.session.userName,
-				email: req.session.userEmail,
-			},
-		});
-	} catch (error) {
-		console.error("Error getSessionUser:", error);
-		res.status(500).json({ success: false, message: "Error getting session user" });
-	}
+       try {
+              if (!req.session.userId || !req.session.userName || !req.session.userEmail) {
+                     res.status(401).json({ success: false, message: "Not logged in" });
+                     return;
+              }
+              res.status(200).json({
+                     success: true,
+                     data: {
+                            id: req.session.userId,
+                            name: req.session.userName,
+                            email: req.session.userEmail,
+                            phone_number: req.session.userPhoneNumber,
+                     },
+              });
+       } catch (error) {
+              console.error("Error getSessionUser:", error);
+              res.status(500).json({ success: false, message: "Error getting session user" });
+       }
+};
+
+export const updateProfile: RequestHandler = async (req, res) => {
+       try {
+              if (!req.session.userId) {
+                     res.status(401).json({ success: false, message: "Not logged in" });
+                     return;
+              }
+              const { name, email, phone_number } = req.body;
+              const userId = req.session.userId;
+              await db.execute(
+                     "UPDATE users SET name = ?, email = ?, phone_number = ? WHERE id = ?",
+                     [name, email, phone_number, userId]
+              );
+
+              req.session.userName = name;
+              req.session.userEmail = email;
+              req.session.userPhoneNumber = phone_number;
+
+              res.json({ success: true });
+       } catch (error) {
+              console.error("Error updating profile:", error);
+              res.status(500).json({ success: false, message: "Error updating profile" });
+       }
+};
+
+export const deleteAccount: RequestHandler = async (req, res) => {
+       try {
+              if (!req.session.userId) {
+                     res.status(401).json({ success: false, message: "Not logged in" });
+                     return;
+              }
+
+              const { password } = req.body;
+              const userId = req.session.userId;
+
+              const [rows] = await db.execute<RowDataPacket[]>(
+                     "SELECT id, name, email, password, phone_number FROM users WHERE id = ?",
+                     [userId]
+              );
+
+              const user = rows[0];
+
+              if (!user) {
+                     res.status(404).json({ success: false, message: "User not found" });
+                     return;
+              }
+
+              const isValidPassword = await bcrypt.compare(password, user.password);
+              if (!isValidPassword) {
+                     res.status(401).json({ success: false, message: "Invalid password" });
+                     return;
+              }
+
+              await db.execute("DELETE FROM users WHERE id = ?", [userId]);
+
+              req.session.destroy((err) => {
+                     if (err) {
+                            console.error("Error deleting session:", err);
+                            return res.status(500).json({ success: false, message: "Error deleting session" });
+                     }
+
+                     res.clearCookie('connect.sid');
+                     return res.status(200).json({ success: true, message: "Account deleted successfully" });
+              });
+       } catch (error) {
+              console.error("Error deleting account:", error);
+              res.status(500).json({ success: false, message: "Error deleting account" });
+       }
 };
