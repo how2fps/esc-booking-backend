@@ -93,7 +93,6 @@ export const getHotelById = async (req: Request, res: Response): Promise<void> =
        try {
               const hotelId = req.params.id;
               const validIdPattern = /^[a-zA-Z0-9]{4}$/;
-              // Check for undefined, null, empty string, or invalid format
               if (!hotelId || typeof hotelId !== "string" || hotelId.trim() === "" || !validIdPattern.test(hotelId)) {
                      res.status(404).json({
                             success: false,
@@ -103,7 +102,6 @@ export const getHotelById = async (req: Request, res: Response): Promise<void> =
               }
               const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/${hotelId}`);
               if (!response.ok) {
-                     // If external API returns 500, propagate as 500
                      const status = response.status === 500 ? 500 : 404;
                      res.status(status).json({
                             success: false,
@@ -112,7 +110,6 @@ export const getHotelById = async (req: Request, res: Response): Promise<void> =
                      return;
               }
               const data = await response.json();
-              // If data is empty or missing required fields, treat as not found
               if (!data || typeof data !== "object" || Array.isArray(data) || !data.id || !data.name) {
                      res.status(404).json({
                             success: false,
@@ -122,7 +119,6 @@ export const getHotelById = async (req: Request, res: Response): Promise<void> =
               }
               res.status(200).json(data);
        } catch (error: any) {
-              // If error is a network error or fetch throws, treat as not found
               if (error?.message === "Hotel not found" || error?.message?.toLowerCase().includes("network error") || error?.message?.toLowerCase().includes("failed to fetch") || error?.message?.toLowerCase().includes("complete system failure")) {
                      res.status(404).json({
                             success: false,
