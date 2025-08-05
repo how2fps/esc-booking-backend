@@ -9,7 +9,15 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
       ui_mode: 'embedded',
       line_items: [
         {
-          price: 'price_1RoeoAFyaklkAMXyQ73FxwdC',
+          // Use price_data to create a price and product on the fly
+          price_data: {
+            currency: 'usd', // Or your desired currency
+            unit_amount: 2000, // The price from your database (in cents)
+            product_data: {
+              name: 'testingg prod', // A descriptive name for the product
+              description: 'testinggggggg desc',
+            },
+          },
           quantity: 1,
         },
       ],
