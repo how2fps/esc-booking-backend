@@ -74,15 +74,13 @@ export const pollAllHotelPrices = async (req: Request, res: Response): Promise<v
                      }
                      const data = await response.json();
                      if (data && data.completed) {
-                            res.status(200).json({ complete: true, data });
+                            res.status(200).json(data);
                             return;
                      }
                      await sleep(2000);
               } catch (error) {
                      console.log(error);
               }
-
-              res.status(504).json({ complete: false, message: "Timeout waiting for price data" });
        } catch (error) {
               console.log(error);
               res.status(500).json({ error: "Internal Server Error" });
