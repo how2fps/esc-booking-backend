@@ -2,7 +2,14 @@ import { Request, Response } from "express";
 const isSafeAlphaNum = (val: unknown): val is string => typeof val === "string" && /^[a-zA-Z0-9_-]+$/.test(val);
 const isDateString = (val: unknown): val is string => typeof val === "string" && !isNaN(Date.parse(val));
 const isPositiveInteger = (val: unknown): val is string => typeof val === "string" && /^\d+$/.test(val);
-
+const isValidGuestFormat = (guests: unknown): boolean => {
+       if (typeof guests === "string") {
+              if (!guests) return false;
+              const parts = guests.split("|");
+              return parts.every((part) => /^\d+$/.test(part) && Number(part) > 0);
+       }
+       return false;
+};
 export const getAllHotels = async (req: Request, res: Response): Promise<void> => {
        try {
               const { destination_id } = req.query;
@@ -55,7 +62,7 @@ export const pollAllHotelPrices = async (req: Request, res: Response): Promise<v
               if (!isDateString(checkout)) {
                      return void res.status(400).json({ message: "Invalid checkout date format" });
               }
-              if (!isPositiveInteger(guests)) {
+              if (!isValidGuestFormat(guests)) {
                      return void res.status(400).json({ message: "Invalid guests format" });
               }
               if (landing_page && !isSafeAlphaNum(landing_page)) {
