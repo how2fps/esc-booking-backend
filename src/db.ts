@@ -1,7 +1,9 @@
 import dotenv from "dotenv";
 import mysql from "mysql2/promise";
 
-dotenv.config({ path: ".env.dev" });
+const envFile = process.env.NODE_ENV === "production" ? ".env" : ".env.dev";
+
+dotenv.config({ path: envFile });
 
 const dbConfig = {
        host: process.env.DB_HOST,
@@ -10,7 +12,8 @@ const dbConfig = {
        database: process.env.DB_NAME,
        port: parseInt(process.env.DB_PORT || "3306"),
 };
-
+console.log(`Loaded environment from ${envFile}`);
+console.log(`Connected with ${dbConfig.host} to database: ${dbConfig.database}`);
 const pool = mysql.createPool({
        ...dbConfig,
        waitForConnections: true,
