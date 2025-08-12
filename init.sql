@@ -23,7 +23,7 @@ ON DUPLICATE KEY UPDATE name=name;
 
 CREATE TABLE if NOT EXISTS bookings (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL, 
+  user_id INT NOT NULL,
   hotel_name VARCHAR(255),
   room_type VARCHAR(100),
   number_of_nights INT,
@@ -38,13 +38,14 @@ CREATE TABLE if NOT EXISTS bookings (
   email VARCHAR(100),
   special_requests TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  payment_status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  stripe_session_id VARCHAR(255) NULL,
+  currency VARCHAR(10) NOT NULL DEFAULT 'USD',
   CONSTRAINT fk_bookings_user
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  INDEX idx_bookings_user (user_id),
-  INDEX idx_bookings_dates (start_date, end_date)
-) ENGINE=InnoDB;
+    ON UPDATE CASCADE
+);
 
 INSERT INTO bookings (
   user_id, hotel_name, room_type, number_of_nights,
@@ -53,10 +54,10 @@ INSERT INTO bookings (
   first_name, last_name, phone_number, email,
   special_requests
 ) VALUES
-  (1, 'Grand Hotel', 'Double Room', 4, '2023-12-01', '2023-12-05', 2, 0, 500.00, 'Alice', 'Johnson', '+1-555-0101', 'alice.johnson@email.com', 'Late check-in if possible'),
-  (2, 'Ocean Breeze Resort', 'Suite', 3, '2023-11-10', '2023-11-13', 2, 1, 750.00, 'Bob', 'Smith', '+65 91234567', 'bob.smith@email.com', 'Need a crib for toddler'),
-  (3, 'City Lights Inn', 'Single Room', 2, '2023-10-05', '2023-10-07', 1, 0, 180.00, 'Carol', 'Williams', '+1-555-0103', 'carol.williams@email.com', 'Quiet room away from elevator'),
-  (4, 'Mountain View Lodge', 'Deluxe Room', 5, '2023-12-20', '2023-12-25', 2, 2, 1200.00, 'David', 'Brown', '+1-555-0104', 'david.brown@email.com', 'Adjoining rooms if possible')
+  (1, 'Grand Hotel', 'Double Room', 4, '2023-12-01', '2023-12-05', 2, 0, 500.00, 'Alice', 'Johnson', '12345678', 'john@example.com', 'Late check-in if possible'),
+  (2, 'Ocean Breeze Resort', 'Suite', 3, '2023-11-10', '2023-11-13', 2, 1, 750.00, 'Bob', 'Smith', '98765432', 'alice.tan@example.com', 'Need a crib for toddler'),
+  (3, 'City Lights Inn', 'Single Room', 2, '2023-10-05', '2023-10-07', 1, 0, 180.00, 'Carol', 'Williams', '81234567', 'mark.nguyen@example.com', 'Quiet room away from elevator'),
+  (4, 'Mountain View Lodge', 'Deluxe Room', 5, '2023-12-20', '2023-12-25', 2, 2, 1200.00, 'David', 'Brown', '92345678', 'sarah.lee@example.com', 'Adjoining rooms if possible')
 ON DUPLICATE KEY UPDATE hotel_name = hotel_name;
 
 
