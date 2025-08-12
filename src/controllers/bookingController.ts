@@ -3,6 +3,12 @@ import db from "../db";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
+
+    const userId = Number(req.body.user_id ?? (req.session as any)?.user?.id);
+    if (!userId) {
+      return res.status(400).json({ error: "user_id is required (temporarily via body)" });
+    }
+
     const {
       hotelName,
       roomType,
@@ -21,13 +27,15 @@ export const createBooking = async (req: Request, res: Response) => {
 
     const [result] = await db.execute(
       `INSERT INTO bookings (
+        user_id,
         hotel_name, room_type, number_of_nights,
         start_date, end_date,
         num_adults, num_children, price,
         first_name, last_name, phone_number, email,
         special_requests
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        userId,
         hotelName,
         roomType,
         numberOfNights,
