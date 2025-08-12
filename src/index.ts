@@ -5,10 +5,13 @@ import session from "express-session";
 import { testConnection } from "./db";
 import bookingRoutes from "./routes/bookingRoutes";
 import hotelRoutes from "./routes/hotelRoutes";
+import searchRoutes from "./routes/searchRoutes";
 import stripeRoutes from "./routes/stripeRoutes";
 import userRoutes from "./routes/userRoutes";
-import searchRoutes from "./routes/searchRoutes"
-dotenv.config({ path: ".env.dev" });
+
+const envFile = process.env.NODE_ENV === "production" ? ".env" : ".env.dev";
+
+dotenv.config({ path: envFile });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
        cors({
-              origin: "http://localhost:5173",
+              origin: ["http://localhost:5173", "http://54.255.23.219:8080", "https://54.255.23.219:8080"],
               credentials: true,
        })
 );

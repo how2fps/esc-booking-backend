@@ -1,0 +1,19 @@
+services:
+       app:
+              build: .
+              container_name: esc-booking-backend
+              ports:
+                     - "3000:3000"
+              env_file:
+                     - .env
+              environment:
+                     NODE_ENV: production
+              networks:
+                     - app-network
+              restart: unless-stopped
+              stdin_open: true
+              tty: true
+
+networks:
+       app-network:
+              driver: bridge
