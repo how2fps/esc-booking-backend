@@ -7,6 +7,7 @@ router.get("/users", getAllUsers);
 router.get("/users/:id", getUserById);
 router.get("/users/email/:email", getUserByEmail);
 router.get("/session", getSessionUser);
+router.get('/me', getSessionUser); 
 router.post("/signup", signUp);
 router.post("/login", login);
 router.post("/logout", logout);
