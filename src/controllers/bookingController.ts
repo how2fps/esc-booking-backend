@@ -39,6 +39,7 @@ export const createBooking = async (req: Request, res: Response) => {
       numAdults,
       numChildren,
       price,
+      currency,
       firstName,
       lastName,
       phoneNumber,
@@ -51,10 +52,10 @@ export const createBooking = async (req: Request, res: Response) => {
         user_id,
         hotel_name, room_type, number_of_nights,
         start_date, end_date,
-        num_adults, num_children, price,
+        num_adults, num_children, price, currency,
         first_name, last_name, phone_number, email,
         special_requests
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
         hotelName,
@@ -65,6 +66,7 @@ export const createBooking = async (req: Request, res: Response) => {
         numAdults,
         numChildren,
         price,
+        currency,
         firstName,
         lastName,
         phoneNumber,

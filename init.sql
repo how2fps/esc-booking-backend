@@ -40,6 +40,7 @@ CREATE TABLE if NOT EXISTS bookings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   payment_status VARCHAR(50) NOT NULL DEFAULT 'pending',
   stripe_session_id VARCHAR(255) NULL,
+  currency VARCHAR(10) NOT NULL DEFAULT 'USD',
   CONSTRAINT fk_bookings_user
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE

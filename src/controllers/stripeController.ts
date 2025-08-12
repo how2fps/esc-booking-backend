@@ -9,6 +9,7 @@ const stripe = new Stripe('sk_test_51RlnqVCRemnaR0EMd4fECOKcK7Q0CvtIP5w3rLzBX1fX
 interface Booking extends RowDataPacket {
   id: number;
   price: number;
+  currency: string;
   hotel_name: string;
   room_type: string;
 }
@@ -47,7 +48,7 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: booking.currency, // Use the currency from the database
             unit_amount: priceInCents, // Use the price from the database
             product_data: {
               name: `Booking at ${booking.hotel_name}`, // Use the hotel name from the database

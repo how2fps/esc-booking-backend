@@ -23,7 +23,7 @@ const cleanupPendingBookings = async () => {
   console.log('Running cleanup for pending bookings...');
   
   // This is where you set the short time period for testing
-  const cutoff = new Date(Date.now() - 30 * 1000); // 30 seconds ago
+  const cutoff = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2h ago
 
   // This SQL query deletes old, unpaid bookings
   const sqlQuery = "DELETE FROM `bookings` WHERE `payment_status` = 'pending' AND `created_at` < ?";
@@ -42,9 +42,9 @@ const cleanupPendingBookings = async () => {
   }
 };
 
-// This schedules the cleanup function to run every minute for easy testing
-cron.schedule('* * * * *', () => {
-  console.log('Triggering cleanup task...');
+
+cron.schedule('0 * * * *', () => {
+  console.log('Triggering hourly cleanup task...');
   cleanupPendingBookings();
 });
 
