@@ -62,7 +62,7 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
       metadata: {
         bookingId: booking.id,
       },
-      return_url: `http://localhost:5173/return?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `http://localhost:5173/return?session_id={CHECKOUT_SESSION_ID}&booking_id=${booking.id}`
     });
 
     res.send({ clientSecret: session.client_secret });
