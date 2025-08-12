@@ -198,6 +198,56 @@ export const updateProfile: RequestHandler = async (req, res) => {
        }
 };
 
+export const updatePassword: RequestHandler = async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            res.status(401).json({ success: false, message: "Not logged in" });
+            return;
+        }
+    
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.session.userId;
+    
+        // Fetch user
+        const [rows] = await db.execute<RowDataPacket[]>(
+            "SELECT id, password FROM users WHERE id = ?",
+            [userId]
+        );
+    
+        const user = rows[0];
+    
+        if (!user) {
+            res.status(404).json({ success: false, message: "User not found" });
+            return;
+        }
+    
+        // Verify current password
+        const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+        if (!isValidPassword) {
+            res.status(401).json({ success: false, message: "Current password is incorrect" });
+            return;
+        }
+    
+        // Optional: Validate newPassword length/complexity here
+        if (typeof newPassword !== "string" || newPassword.length < 8 
+            || !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+            res.status(400).json({ success: false, message: "New password must be at least 8 characters and contain a mix of uppercase letters, lowercase letters, and numbers." });
+            return;
+        }
+    
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+        // Update password in DB
+        await db.execute("UPDATE users SET password = ? WHERE id = ?", [hashedPassword, userId]);
+    
+        res.status(200).json({ success: true, message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error updating password:", error);
+        res.status(500).json({ success: false, message: "Error updating password" });
+    }
+};
+
 export const deleteAccount: RequestHandler = async (req, res) => {
        try {
               if (!req.session.userId) {
