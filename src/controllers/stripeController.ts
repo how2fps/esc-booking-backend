@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import db from '../db'; // 1. Import your mysql2 connection pool
 import { RowDataPacket } from 'mysql2'; // 2. Import the type for database rows
 
-const stripe = new Stripe('sk_test_51RlnqCFyaklkAMXy3bGjZAbtqwV5YTo1XMzIOv6UBE4zyixDyJx7zM0L1zUDMuw3LSV5K4d14RmmMdVfZ0URPMbT00DeV4VJS3');
+const stripe = new Stripe('sk_test_51RlnqVCRemnaR0EMd4fECOKcK7Q0CvtIP5w3rLzBX1fXXemahGvC8IQZCevU1mrRkSpKgBo1n2GBVkz2zk5T9DFA003KFtV0Vl');
 
 // 3. Define a type for the data you expect from your 'bookings' table
 interface Booking extends RowDataPacket {
